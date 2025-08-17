@@ -173,7 +173,7 @@ async function apiFetch<T = any>(options: ApiOptions): Promise<ApiResponse<T>> {
     
     return {
       status: response.status,
-      data: responseData as T,
+      data: responseData?.data as T,
     };
   } catch (error) {
     // Re-throw ApiErrors as-is

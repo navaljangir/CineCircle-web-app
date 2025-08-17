@@ -9,7 +9,8 @@ import {
 } from "react-router";
 
 import type { Route } from "./+types/root";
-import { AppProviders } from "~/lib/providers";
+import { AppProviders } from "~/Providers";
+import { ThemeProvider } from "~/components/theme-provider";
 import { get } from "~/lib/api";
 import { ENDPOINTS } from "~/lib/endpoints";
 import type { User } from "~/types/auth";
@@ -47,14 +48,14 @@ export async function loader({ request }: { request: Request }) {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="min-h-screen bg-background font-sans antialiased">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -64,12 +65,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const { user } = useLoaderData<{ user: User | null }>();
-  
+  const data = useLoaderData();
+
   return (
-    <AppProviders user={user}>
-      <Outlet />
-    </AppProviders>
+    <ThemeProvider defaultTheme="system" storageKey="cinecircle-ui-theme">
+      <AppProviders user={data?.user}>
+        <Outlet />
+      </AppProviders>
+    </ThemeProvider>
   );
 }
 
