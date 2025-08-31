@@ -1,4 +1,4 @@
-import type { Route } from "./+types/home";
+import type { Route } from "./+types/Home";
 import { Link } from "react-router";
 import { Film, Play, Star, Users } from "lucide-react";
 import { Button } from "~/components/ui/button";
@@ -8,32 +8,13 @@ import { ThemeToggle } from "~/components/ThemeToggle";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "CineCircle - Discover Your Next Favorite Movie" },
-    { name: "description", content: "Join CineCircle and discover amazing movies with our community of film enthusiasts." },
+    { name: "description", content: "Join CineCircle and discover amazing series with our community of film enthusiasts." },
   ];
 }
 
 export default function Home() {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <div className="mr-4 flex items-center space-x-2">
-            <Film className="h-6 w-6" />
-            <span className="font-bold">CineCircle</span>
-          </div>
-          
-          <div className="flex flex-1 items-center justify-end space-x-2">
-            <ThemeToggle />
-            <Button asChild variant="ghost">
-              <Link to="/login">Sign In</Link>
-            </Button>
-            <Button asChild>
-              <Link to="/register">Get Started</Link>
-            </Button>
-          </div>
-        </div>
-      </header>
 
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-16">
@@ -57,7 +38,7 @@ export default function Home() {
               </Link>
             </Button>
             <Button asChild variant="outline" size="lg" className="text-lg px-8">
-              <Link to="/movies">Browse Movies</Link>
+              <Link to="/series">Browse Series</Link>
             </Button>
           </div>
         </div>
@@ -69,9 +50,9 @@ export default function Home() {
               <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
                 <Film className="h-6 w-6 text-primary" />
               </div>
-              <CardTitle>Discover Movies</CardTitle>
+              <CardTitle>Discover Series</CardTitle>
               <CardDescription>
-                Explore our vast collection of movies from every genre and era
+                Explore our vast collection of series from every genre and era
               </CardDescription>
             </CardHeader>
           </Card>
@@ -83,7 +64,7 @@ export default function Home() {
               </div>
               <CardTitle>Rate & Review</CardTitle>
               <CardDescription>
-                Share your thoughts and see what others think about your favorite films
+                Share your thoughts and see what others think about your favorite series
               </CardDescription>
             </CardHeader>
           </Card>
@@ -95,7 +76,7 @@ export default function Home() {
               </div>
               <CardTitle>Join Community</CardTitle>
               <CardDescription>
-                Connect with fellow movie lovers and share recommendations
+                Connect with fellow series lovers and share recommendations
               </CardDescription>
             </CardHeader>
           </Card>
@@ -103,9 +84,9 @@ export default function Home() {
 
         {/* CTA Section */}
         <div className="mt-24 text-center space-y-4">
-          <h2 className="text-3xl font-bold">Ready to Start Your Movie Journey?</h2>
+          <h2 className="text-3xl font-bold">Ready to Start Your Series Journey?</h2>
           <p className="text-muted-foreground text-lg">
-            Join thousands of movie enthusiasts on CineCircle
+            Join thousands of series enthusiasts on CineCircle
           </p>
           <Button asChild size="lg" className="mt-6">
             <Link to="/register">Create Free Account</Link>

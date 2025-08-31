@@ -1,6 +1,6 @@
-import { post } from "~/lib/api";
+import { post, get } from "~/api/api";
 import { ENDPOINTS } from "~/lib/endpoints";
-import type { AuthResponse, LoginCredentials, RegisterCredentials } from "~/types/auth";
+import type { AuthResponse, LoginCredentials, RegisterCredentials, User } from "~/types/auth";
 
 /**
  * Authentication Services
@@ -103,4 +103,24 @@ export async function logoutAll(request?: Request) {
   });
   
   return response.data;
+}
+
+// Get authenticated user data (for loader functions)
+export async function getAuthenticatedUser(request?: Request) {
+    const response = await get<{ user: User }>({
+      url: ENDPOINTS.GET_USER_PROFILE,
+      useAuth: true,
+      fetchRequest: request,
+    });
+    
+    return response;
+}
+
+
+export async function userInit(request : Request){
+  return get({
+    url : ENDPOINTS.GET_USER_INIT,
+    useAuth: true,
+    fetchRequest: request,
+  })
 }

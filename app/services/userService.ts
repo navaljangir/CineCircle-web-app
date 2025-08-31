@@ -1,4 +1,4 @@
-import { get, put, deleteRequest } from "~/lib/api";
+import { get, put, deleteRequest } from "~/api/api";
 import { ENDPOINTS } from "~/lib/endpoints";
 import type { User } from "~/types/auth";
 

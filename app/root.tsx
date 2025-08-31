@@ -5,15 +5,10 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  useLoaderData,
 } from "react-router";
 
 import type { Route } from "./+types/root";
-import { AppProviders } from "~/Providers";
 import { ThemeProvider } from "~/components/theme-provider";
-import { get } from "~/lib/api";
-import { ENDPOINTS } from "~/lib/endpoints";
-import type { User } from "~/types/auth";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -28,23 +23,6 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
 ];
-
-// Root loader to get user data if authenticated
-export async function loader({ request }: { request: Request }) {
-  try {
-    // Try to get current user data from API (cookies will be sent automatically)
-    const response = await get<{ user: User }>({
-      url: ENDPOINTS.GET_USER_PROFILE,
-      useAuth: true,
-      fetchRequest: request,
-    });
-
-    return { user: response.data.user };
-  } catch (error) {
-    // If API call fails, user is not authenticated
-    return { user: null };
-  }
-}
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -65,13 +43,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  const data = useLoaderData();
-
   return (
     <ThemeProvider defaultTheme="system" storageKey="cinecircle-ui-theme">
-      <AppProviders user={data?.user}>
-        <Outlet />
-      </AppProviders>
+      <Outlet />
     </ThemeProvider>
   );
 }

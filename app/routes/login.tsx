@@ -4,7 +4,6 @@ import { Form, Link, useActionData, useNavigation } from "react-router";
 import { useState } from "react";
 import { Eye, EyeOff, Loader2, Chrome, Facebook } from "lucide-react";
 import { login } from "~/services/authService";
-import { setAuthInStore } from "~/lib/loaders";
 import { getUserProfile } from "~/services/userService";
 import { ApiError } from "~/lib/errors";
 import { Button } from "~/components/ui/button";
@@ -26,8 +25,8 @@ export function meta() {
 export async function loader({ request }: LoaderFunctionArgs) {
   // Check if user is already logged in
   try {
-    await getUserProfile(request);
-    return redirect("/dashboard");
+    // await getUserProfile(request);
+    // return redirect("/dashboard");
   } catch (error) {
     // User is not logged in, continue to login page
     return null;
@@ -57,14 +56,18 @@ export async function action({ request }: ActionFunctionArgs) {
 
   try {
     const result = await login({ email, password, rememberMe }, request);
-    console.log('result' , result)
     
-    // Redirect to dashboard
-    return redirect("/dashboard", {
-    headers: {
-      "Set-Cookie": `${AUTH_COOKIE}=${result.accessToken}; HttpOnly; Path=/`
-    }
-  });
+    // Create multiple cookies for different parts of the auth data
+    const headers = new Headers();
+    
+    // Main auth token cookie
+    const maxAge = rememberMe ? 2592000 : 86400; // 30 days or 24 hours
+    const authCookieValue = `${AUTH_COOKIE}=${result.refreshToken}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
+    headers.append("Set-Cookie", authCookieValue);
+    console.log('result' , result)
+    return redirect("/login", {
+      headers: headers
+    });
     
   } catch (error) {
     console.error("Login error:", error);
