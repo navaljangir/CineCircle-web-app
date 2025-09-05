@@ -1,6 +1,9 @@
 import { AUTH_COOKIE, METHOD, PLATFORM, HTTP_CODE } from "~/lib/constants";
 import { ApiError } from "~/lib/errors";
 import type { CustomObject, EMethod, ApiResponse } from "~/types/api";
+import { store } from "~/lib/store/store";
+import { selectAccessToken, selectRefreshToken, setTokens, setAuthData, clearAuth } from "~/lib/store/slices/authSlice";
+import { ENDPOINTS } from "~/lib/endpoints";
 
 // Global type declaration for client-side window object
 declare global {
@@ -28,7 +31,7 @@ interface ApiOptions {
   auth?: { token: string }; // Alternative auth method
 }
 
-const DEFAULT_QUERY_PARAMS = { os: PLATFORM.WEB, cv: 1 };
+const DEFAULT_QUERY_PARAMS = { os: PLATFORM.WEB };
 
 /**
  * Determines if we're running on the server or client
@@ -47,7 +50,7 @@ function getBaseUrl(): string {
   } else {
     // Client-side: use window origin or development URL
     return import.meta.env.VITE_ENV === "dev"
-      ? "http://localhost:5173"
+      ? "http://localhost:3000"
       : window.origin;
   }
 }
@@ -90,17 +93,65 @@ function getAuthToken(options: ApiOptions): string {
       return authCookie.split("=")[1];
     }
   }
-  
-  // Client-side: could implement additional token retrieval logic here
-  // For example, from localStorage, sessionStorage, etc.
+
+  // Client-side: get token from Redux state
+  if (!isServer()) {
+    console.log('')
+    const state = store.getState();
+    const token = selectAccessToken(state);
+    console.log('token' , token)
+    if (token) {
+      return token;
+    }
+  }
   
   return '';
 }
 
 /**
+ * Refresh the access token using refresh token from cookies
+ */
+async function refreshAccessToken(): Promise<{ accessToken: string; refreshToken: string } | null> {
+  try {
+    const baseUrl = getBaseUrl();
+    
+    const response = await fetch(`${baseUrl}${ENDPOINTS.REFRESH_TOKEN}`, {
+      method: 'POST',
+      credentials: 'include', // This will send cookies including auth_token
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      // No body needed since refresh token is in cookies under auth_token
+    });
+
+    if (!response.ok) {
+      console.error('Token refresh failed with status:', response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    console.log('Refresh token response:', data);
+    
+    // Check if the response has the expected structure
+    if (data?.data?.accessToken && data?.data?.refreshToken) {
+      return {
+        accessToken: data.data.accessToken,
+        refreshToken: data.data.refreshToken,
+      };
+    } else {
+      console.error('Invalid refresh token response structure:', data);
+      return null;
+    }
+  } catch (error) {
+    console.error('Token refresh error:', error);
+    return null;
+  }
+}
+
+/**
  * Unified API fetch function that works on both server and client
  */
-async function apiFetch<T = any>(options: ApiOptions): Promise<ApiResponse<T>> {
+async function apiFetch<T = any>(options: ApiOptions, isRetry: boolean = false): Promise<ApiResponse<T>> {
   const baseUrl = getBaseUrl();
   
   if (!baseUrl) {
@@ -147,7 +198,7 @@ async function apiFetch<T = any>(options: ApiOptions): Promise<ApiResponse<T>> {
       fetchOptions.body = JSON.stringify(options.body);
     }
   }
-  
+
   try {
     const response = await fetch(url, fetchOptions);
     
@@ -159,6 +210,37 @@ async function apiFetch<T = any>(options: ApiOptions): Promise<ApiResponse<T>> {
       responseData = await response.json();
     } else {
       responseData = await response.text();
+    }
+    
+    // Handle token expiration (401 Unauthorized)
+    if (response.status === 401 && options.useAuth && !isRetry && !isServer()) {
+      console.log('Token expired, attempting refresh...');
+      const refreshResult = await refreshAccessToken();
+      
+      if (refreshResult) {
+        console.log('Token refreshed successfully');
+        // Update only the tokens in store, keep the existing user data
+        const state = store.getState();
+        const currentUser = state.auth.user;
+        
+        if (currentUser) {
+          store.dispatch(setAuthData({
+            user: currentUser, // Keep existing user data
+            accessToken: refreshResult.accessToken,
+            refreshToken: refreshResult.refreshToken,
+          }));
+          
+          console.log('Retrying original request with new token');
+          // Retry the original request with new token
+          return apiFetch<T>(options, true);
+        } else {
+          console.error('No current user found during token refresh');
+        }
+      } else {
+        console.log('Token refresh failed, clearing auth state');
+        // Refresh failed, clear auth state
+        store.dispatch(clearAuth());
+      }
     }
     
     // Handle non-ok responses
@@ -189,9 +271,7 @@ async function apiFetch<T = any>(options: ApiOptions): Promise<ApiResponse<T>> {
       url
     );
   }
-}
-
-// HTTP method helpers
+}// HTTP method helpers
 export async function get<T = any>(options: Omit<ApiOptions, 'method'>): Promise<ApiResponse<T>> {
   return apiFetch<T>({ ...options, method: METHOD.GET });
 }

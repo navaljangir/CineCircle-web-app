@@ -8,7 +8,6 @@ import type { User } from "~/types/auth";
 export async function loader({ request }: { request: Request }) {
   try {
     const result = await userInit(request);
-    console.log('Auth loader result:', result);
     return result?.data;
   } catch (error) {
     console.error('Error loading user data:', error);
@@ -21,11 +20,11 @@ export function shouldRevalidate(){
 }
 
 export default function AppLayout() {
-  const data = useLoaderData<{ user: User | null }>();
-
+  const data = useLoaderData<{ user: User | null , accessToken : string | null }>();
+  // console.log('data' , data)
   return (
     <AppProviders >
-      <AuthInitializer userData={data?.user || null} />
+      <AuthInitializer initialData={data || null} />
       <Outlet />
     </AppProviders>
   );

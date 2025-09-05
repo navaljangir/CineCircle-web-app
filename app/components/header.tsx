@@ -11,6 +11,7 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "~/components/ui/avatar";
 import { ThemeToggle } from "~/components/ThemeToggle";
+import { SearchDropdown } from "~/components/SearchDropdown";
 import { useAppSelector } from "~/hooks";
 import { selectUser } from "~/lib/store/slices/authSlice";
 
@@ -44,12 +45,11 @@ export function Header() {
             >
               Browse Series
             </Link>
-            <Link
-              to="/search"
-              className="inline-flex items-center rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground py-2 px-3"
-            >
-              Search
-            </Link>
+          </div>
+
+          {/* Search Dropdown */}
+          <div className="flex-1 max-w-sm">
+            <SearchDropdown />
           </div>
           
           <nav className="flex items-center space-x-2">

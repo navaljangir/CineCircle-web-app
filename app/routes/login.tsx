@@ -25,8 +25,8 @@ export function meta() {
 export async function loader({ request }: LoaderFunctionArgs) {
   // Check if user is already logged in
   try {
-    // await getUserProfile(request);
-    // return redirect("/dashboard");
+    await getUserProfile(request);
+    return redirect("/dashboard");
   } catch (error) {
     // User is not logged in, continue to login page
     return null;
@@ -65,7 +65,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const authCookieValue = `${AUTH_COOKIE}=${result.refreshToken}; Path=/; Max-Age=${maxAge}; SameSite=Lax`;
     headers.append("Set-Cookie", authCookieValue);
     console.log('result' , result)
-    return redirect("/login", {
+    return redirect("/", {
       headers: headers
     });
     

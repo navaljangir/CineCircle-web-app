@@ -2,16 +2,12 @@ import type { LoaderFunctionArgs } from "react-router";
 import { data, redirect } from "react-router";
 import { Link, useLoaderData } from "react-router";
 import { Film, Clock, Bookmark, Search, Star, Play } from "lucide-react";
-import { getAllSeries, getFeaturedSeries } from "~/services/seriesService";
+import { getFeaturedSeries } from "~/services/seriesService";
 import { useAppSelector } from "~/hooks";
 import { selectUser, selectIsAuthenticated } from "~/lib/store/slices/authSlice";
-import { Header } from "~/components/header";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
-import type { User } from "~/types/auth";
-import type { Series } from "~/types/series";
-
 export function meta() {
   return [
     { title: "Dashboard - CineCircle" },
@@ -25,7 +21,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
     const [featuredSeries] = await Promise.all([
       getFeaturedSeries(request),
     ]);
-    console.log(featuredSeries);
     return data({
       featuredSeries,
     });

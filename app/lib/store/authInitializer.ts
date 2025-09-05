@@ -1,22 +1,47 @@
 import { useEffect } from 'react';
 import { useAppDispatch } from '~/hooks';
-import { setUser, clearAuth } from './slices/authSlice';
+import { setAuthData, clearAuth } from './slices/authSlice';
 import type { User } from '~/types/auth';
 
-interface AuthInitializerProps {
-  userData: User | null;
+interface AuthData {
+  user: User;
+  accessToken: string;
+  refreshToken?: string;
 }
 
-export function AuthInitializer({ userData }: AuthInitializerProps) {
+interface InitialDataType{
+  user: User | null;
+  accessToken: string | null;
+}
+
+interface AuthInitializerProps {
+  initialData: InitialDataType | null;
+  authData?: AuthData | null;
+}
+
+export function AuthInitializer({ initialData, authData }: AuthInitializerProps) {
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    if (userData) {
-      dispatch(setUser(userData));
+    if (authData) {
+      // If we have full auth data (user + tokens), use that
+      dispatch(setAuthData({
+        user: authData.user,
+        accessToken: authData.accessToken,
+        refreshToken: authData.refreshToken || '',
+      }));
+    } else if (initialData && initialData.user) {
+      // If we only have user data, just set the user
+      dispatch(setAuthData({
+        user: initialData?.user,
+        accessToken: initialData.accessToken || '',
+        refreshToken: '', // No refresh token in this case
+      }));
     } else {
+      // No auth data, clear state
       dispatch(clearAuth());
     }
-  }, [userData, dispatch]);
+  }, [initialData, authData, dispatch]);
   
   return null;
 }

@@ -15,6 +15,8 @@ export async function login(credentials: LoginCredentials, request?: Request) {
     fetchRequest: request,
   });
   
+  // The response should contain both user and accessToken
+  // Based on your example: { user: {...}, accessToken: "..." }
   return response.data;
 }
 
@@ -70,25 +72,25 @@ export async function otpLogin(
   return response.data;
 }
 
-// Refresh access token
-export async function refreshToken(refreshToken: string, request?: Request) {
+// Refresh access token (uses refresh token from cookies)
+export async function refreshToken(request?: Request) {
   const response = await post<{ accessToken: string; refreshToken: string; expiresIn: string }>({
     url: ENDPOINTS.REFRESH_TOKEN,
-    body: { refreshToken },
-    useAuth: false,
+    useAuth: false, // Don't use access token for refresh
     fetchRequest: request,
+    // No body needed since refresh token is in cookies
   });
   
   return response.data;
 }
 
-// Logout
-export async function logout(refreshToken?: string, request?: Request) {
+// Logout (uses refresh token from cookies)
+export async function logout(request?: Request) {
   const response = await post<{ message: string }>({
     url: ENDPOINTS.LOGOUT,
-    body: refreshToken ? { refreshToken } : undefined,
-    useAuth: false,
+    useAuth: false, // Don't use access token for logout
     fetchRequest: request,
+    // No body needed since refresh token is in cookies
   });
   
   return response.data;

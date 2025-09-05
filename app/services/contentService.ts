@@ -26,7 +26,22 @@ export async function getContentById(contentId: number, request?: Request) {
   return response.data;
 }
 
-// Search content
+// Quick search content
+export async function quickSearchContent(
+  query: string,
+  request?: Request
+) {
+  const response = await get<ContentSearchResult[]>({
+    url: ENDPOINTS.SEARCH_CONTENT,
+    query: { q: query },
+    useAuth: true,
+    fetchRequest: request,
+  });
+  
+  return response.data;
+}
+
+// Search content (for full search functionality)
 export async function searchContent(
   query: string,
   options: {

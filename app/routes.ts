@@ -13,7 +13,6 @@ export default [
             route('/series', "routes/Series.tsx"),
             route('/series/:id', "routes/SeriesDetail.tsx"),
             route('/content/:id', "routes/ContentDetail.tsx"),
-            route('/search', "routes/Search.tsx"),
         ]),
         
         // Catch-all route for well-known URLs (Chrome DevTools, security.txt, etc.)

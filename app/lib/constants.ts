@@ -7,9 +7,9 @@ export const METHOD = {
 } as const;
 
 export const PLATFORM = {
-  WEB: 'web',
-  MOBILE: 'mobile',
-  DESKTOP: 'desktop',
+  WEB: 0,
+  MOBILE: 1,
+  DESKTOP: 2,
 } as const;
 
 export const HTTP_CODE = {
