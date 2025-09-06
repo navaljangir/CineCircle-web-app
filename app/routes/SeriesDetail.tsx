@@ -1,28 +1,33 @@
-import type { LoaderFunctionArgs, MetaFunction } from "react-router";
+  import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 import { useLoaderData, Link } from "react-router";
-import { getSeriesById } from "~/services/seriesService";
-import { getContentById } from "~/services/contentService";
+import { getSeriesByTitle } from "~/services/seriesService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
-import { Film, Play, Clock, Calendar } from "lucide-react";
+import { Film, Play, ArrowLeft } from "lucide-react";
+import { slugToTitle } from "~/lib/seriesUtils";
+import type { Movie } from "~/types/series";
 
 export const meta: MetaFunction = ({ params }) => {
+  const displayTitle = params.title ? slugToTitle(params.title) : 'Series';
   return [
-    { title: `Series ${params.id} - CineCircle` },
-    { name: "description", content: "Watch series episodes on CineCircle." },
+    { title: `${displayTitle} - CineCircle` },
+    { name: "description", content: "Watch series movies on CineCircle." },
   ];
 };
 
 export async function loader({ params, request }: LoaderFunctionArgs) {
-  const seriesId = parseInt(params.id || "");
+  const titleSlug = params.title || "";
   
-  if (isNaN(seriesId)) {
-    throw new Response("Invalid series ID", { status: 400 });
+  if (!titleSlug) {
+    throw new Response("Series title is required", { status: 400 });
   }
 
   try {
-    const series = await getSeriesById(seriesId, request);
+    // Convert URL slug back to proper title
+    const seriesTitle = slugToTitle(titleSlug);
+    
+    const series = await getSeriesByTitle(seriesTitle, request);
     
     if (!series) {
       throw new Response("Series not found", { status: 404 });
@@ -41,141 +46,123 @@ export default function SeriesDetail() {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-8">
+        {/* Back Button */}
+        <div className="mb-6">
+          <Button asChild variant="outline">
+            <Link to="/series">
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Series
+            </Link>
+          </Button>
+        </div>
+
         {/* Series Header */}
         <div className="mb-8">
-          <div className="flex items-center space-x-4 mb-4">
-            {series.partner?.logo_url ? (
-              <img 
-                src={series.partner.logo_url} 
-                alt={series.partner.name}
-                className="h-12 w-12 rounded"
-              />
-            ) : (
-              <Film className="h-12 w-12" />
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Series Image */}
+            {series.image_url && (
+              <div className="lg:w-1/3">
+                <div className="aspect-video rounded-lg overflow-hidden">
+                  <img
+                    src={series.image_url}
+                    alt={series.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              </div>
             )}
-            <div>
+            
+            {/* Series Info */}
+            <div className="lg:w-2/3 space-y-4">
+              {series.partner_name && (
+                <Badge variant="secondary" className="w-fit">
+                  {series.partner_name}
+                </Badge>
+              )}
               <h1 className="text-3xl font-bold">{series.title}</h1>
-              {series.partner && (
-                <p className="text-muted-foreground">by {series.partner.name}</p>
+              {series.description && (
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  {series.description}
+                </p>
               )}
             </div>
           </div>
-          
-          {series.description && (
-            <p className="text-lg text-muted-foreground max-w-3xl">
-              {series.description}
-            </p>
-          )}
         </div>
 
-        {/* Episodes/Content List */}
+        {/* Movies */}
         <section>
-          <h2 className="text-2xl font-bold mb-6">Episodes</h2>
+          <h2 className="text-2xl font-bold mb-6">Movies in this Series</h2>
           
-          {series.content && series.content.length > 0 ? (
-            <div className="space-y-4">
-              {series.content
-                .sort((a, b) => {
-                  // Sort by season and episode number if available
-                  if (a.season !== b.season) {
-                    return (a.season || 0) - (b.season || 0);
-                  }
-                  return (a.episodeNumber || 0) - (b.episodeNumber || 0);
-                })
-                .map((content) => (
-                  <Card key={content.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <CardContent className="p-6">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="text-lg font-semibold">{content.title}</h3>
-                            <div className="flex space-x-2">
-                              {content.season && (
-                                <Badge variant="secondary">
-                                  Season {content.season}
-                                </Badge>
-                              )}
-                              {content.episodeNumber && (
-                                <Badge variant="outline">
-                                  Episode {content.episodeNumber}
-                                </Badge>
-                              )}
-                              <Badge variant="outline">
-                                {content.contentType}
-                              </Badge>
-                            </div>
-                          </div>
-                          
-                          {content.description && (
-                            <p className="text-muted-foreground mb-3 line-clamp-2">
-                              {content.description}
-                            </p>
-                          )}
-                          
-                          <div className="flex items-center space-x-4 text-sm text-muted-foreground">
-                            {content.duration && (
-                              <div className="flex items-center space-x-1">
-                                <Clock className="h-4 w-4" />
-                                <span>{Math.round(content.duration / 60)} min</span>
-                              </div>
-                            )}
-                            <div className="flex items-center space-x-1">
-                              <Calendar className="h-4 w-4" />
-                              <span>{new Date(content.created_at).toLocaleDateString()}</span>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <div className="ml-4">
-                          <Button asChild>
-                            <Link to={`/content/${content.id}`}>
-                              <Play className="mr-2 h-4 w-4" />
-                              Watch
-                            </Link>
-                          </Button>
-                        </div>
-                      </div>
-                      
-                      {/* Progress bar if user has watch progress */}
-                      {content.watchProgress && content.watchProgress.progress_percentage > 0 && (
-                        <div className="mt-4">
-                          <div className="flex items-center justify-between text-sm mb-1">
-                            <span className="text-muted-foreground">Progress</span>
-                            <span className="text-muted-foreground">
-                              {Math.round(content.watchProgress.progress_percentage)}%
-                            </span>
-                          </div>
-                          <div className="w-full bg-muted rounded-full h-2">
-                            <div 
-                              className="bg-primary h-2 rounded-full transition-all duration-300"
-                              style={{ width: `${content.watchProgress.progress_percentage}%` }}
-                            />
-                          </div>
+          {series.movies && series.movies.length > 0 ? (
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              {series.movies.map((movie: Movie) => (
+                <Card key={movie.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                  <Link to={`/movies/${movie.id}`}>
+                    <div className="aspect-[2/3] relative">
+                      {movie.poster_url ? (
+                        <img
+                          src={movie.poster_url}
+                          alt={movie.title}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-muted flex items-center justify-center">
+                          <Film className="h-12 w-12 text-muted-foreground" />
                         </div>
                       )}
-                    </CardContent>
-                  </Card>
-                ))}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                      <div className="absolute bottom-2 left-2 right-2">
+                        <div className="flex justify-between items-end">
+                          {movie.release_year && (
+                            <Badge variant="secondary" className="text-xs">
+                              {movie.release_year}
+                            </Badge>
+                          )}
+                          {movie.imdb_rating && (
+                            <Badge variant="outline" className="text-xs">
+                              ⭐ {movie.imdb_rating}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                  <CardHeader>
+                    <CardTitle className="text-lg line-clamp-1">
+                      {movie.title}
+                    </CardTitle>
+                    {movie.synopsis && (
+                      <CardDescription className="line-clamp-2">
+                        {movie.synopsis}
+                      </CardDescription>
+                    )}
+                    {movie.duration_minutes && (
+                      <p className="text-sm text-muted-foreground">
+                        {Math.floor(movie.duration_minutes / 60)}h {movie.duration_minutes % 60}m
+                      </p>
+                    )}
+                  </CardHeader>
+                  <CardContent>
+                    <Button asChild className="w-full">
+                      <Link to={`/movies/${movie.id}`}>
+                        <Play className="mr-2 h-4 w-4" />
+                        Watch Now
+                      </Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           ) : (
             <div className="text-center py-12">
               <Film className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-semibold mb-2">No Episodes Available</h3>
+              <h3 className="text-lg font-medium mb-2">No movies available</h3>
               <p className="text-muted-foreground">
-                This series doesn't have any episodes yet. Check back later!
+                This series doesn't have any movies yet.
               </p>
             </div>
           )}
         </section>
-
-        {/* Back to Series */}
-        <div className="mt-8">
-          <Button asChild variant="outline">
-            <Link to="/series">
-              ← Back to All Series
-            </Link>
-          </Button>
-        </div>
       </div>
     </div>
   );

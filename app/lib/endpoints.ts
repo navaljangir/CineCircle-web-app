@@ -29,7 +29,7 @@ LOGOUT: "/api/v1/auth/logout",
 
   // Series
   GET_FEATURED_SERIES: "/api/v1/series/featured",
-  GET_SERIES_BY_ID: "/api/v1/series",
+  GET_SERIES_BY_TITLE_OR_ID: "/api/v1/series",
   GET_ALL_SERIES: "/api/v1/series",
 
   // Content

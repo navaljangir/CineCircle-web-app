@@ -16,12 +16,11 @@ export async function loader({ request }: { request: Request }) {
 }
 
 export function shouldRevalidate(){
-  return null;
+  return false;
 }
 
 export default function AppLayout() {
   const data = useLoaderData<{ user: User | null , accessToken : string | null }>();
-  // console.log('data' , data)
   return (
     <AppProviders >
       <AuthInitializer initialData={data || null} />

@@ -11,8 +11,9 @@ export default [
             index("routes/Home.tsx"),
             route('/dashboard', "routes/Dashboard.tsx"),
             route('/series', "routes/Series.tsx"),
-            route('/series/:id', "routes/SeriesDetail.tsx"),
+            route('/series/:title', "routes/SeriesDetail.tsx"),
             route('/content/:id', "routes/ContentDetail.tsx"),
+            // route('/movies/:id', "routes/MovieDetail.tsx"),
         ]),
         
         // Catch-all route for well-known URLs (Chrome DevTools, security.txt, etc.)

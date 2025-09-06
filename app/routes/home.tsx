@@ -1,9 +1,33 @@
 import type { Route } from "./+types/Home";
-import { Link } from "react-router";
+import { Link, useLoaderData } from "react-router";
 import { Film, Play, Star, Users } from "lucide-react";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { ThemeToggle } from "~/components/ThemeToggle";
+import { FeaturedSeries } from "~/components/FeaturedSeries";
+import { SeriesCarousel } from "~/components/SeriesCarousel";
+import { getFeaturedSeries, getAllSeries } from "~/services/seriesService";
+import type { FeaturedSeries as FeaturedSeriesType, Series } from "~/types/series";
+
+export async function loader({ request }: Route.LoaderArgs) {
+  try {
+    const [featuredSeries, allSeriesResponse] = await Promise.all([
+      getFeaturedSeries(request),
+      getAllSeries({ page: 1, limit: 12 }, request)
+    ]);
+
+    return {
+      featuredSeries,
+      recentSeries: allSeriesResponse?.series || []
+    };
+  } catch (error) {
+    console.error('Error loading home data:', error);
+    return {
+      featuredSeries: null,
+      recentSeries: []
+    };
+  }
+}
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -13,6 +37,8 @@ export function meta({}: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const { featuredSeries, recentSeries } = useLoaderData<typeof loader>();
+
   return (
     <div className="min-h-screen bg-background">
 
@@ -42,9 +68,21 @@ export default function Home() {
             </Button>
           </div>
         </div>
+      </main>
 
-        {/* Features */}
-        <div className="mt-24 grid gap-8 md:grid-cols-3">
+      {/* Featured Series Section */}
+      <FeaturedSeries series={featuredSeries} />
+
+      {/* Recent Series Carousel */}
+      <SeriesCarousel 
+        title="Latest Series" 
+        series={recentSeries} 
+        viewAllLink="/series"
+      />
+
+      {/* Features Section */}
+      <section className="container mx-auto px-4 py-16">
+        <div className="grid gap-8 md:grid-cols-3">
           <Card className="text-center">
             <CardHeader>
               <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center mb-4">
@@ -92,7 +130,7 @@ export default function Home() {
             <Link to="/register">Create Free Account</Link>
           </Button>
         </div>
-      </main>
+      </section>
 
       {/* Footer */}
       <footer className="border-t mt-24">
