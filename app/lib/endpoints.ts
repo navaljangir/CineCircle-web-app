@@ -32,6 +32,19 @@ LOGOUT: "/api/v1/auth/logout",
   GET_SERIES_BY_TITLE_OR_ID: "/api/v1/series",
   GET_ALL_SERIES: "/api/v1/series",
 
+  // Movies
+  GET_MOVIES: "/api/v1/movies",
+  GET_FEATURED_MOVIES: "/api/v1/movies/featured",
+  GET_MOVIE_BY_TITLE_OR_ID: "/api/v1/movies",
+  GET_MOVIE_STREAM: "/api/v1/movies",
+  GET_MOVIE_CAST: "/api/v1/movies",
+  GET_MOVIE_RELATED: "/api/v1/movies",
+  SEARCH_MOVIES: "/api/v1/movies/search",
+  GET_MOVIES_BY_DIRECTOR: "/api/v1/movies/director",
+  ADD_MOVIE_TO_WATCHLIST: "/api/v1/movies",
+  REMOVE_MOVIE_FROM_WATCHLIST: "/api/v1/movies",
+  UPDATE_MOVIE_PROGRESS: "/api/v1/movies",
+
   // Content
   GET_CONTENT_BY_ID: "/api/v1/content",
   SEARCH_CONTENT: "/api/v1/content/search",

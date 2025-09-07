@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { Film, Play, Clock, Calendar, Plus, Minus, Heart } from "lucide-react";
+import { formatPercentage } from "~/lib/uiHelper";
 
 export const meta: MetaFunction = ({ params }) => {
   return [
@@ -176,7 +177,7 @@ export default function ContentDetail() {
               <div className="flex items-center justify-between text-sm mb-2">
                 <span className="text-muted-foreground">Your Progress</span>
                 <span className="text-muted-foreground">
-                  {Math.round(content.watchProgress.progress_percentage)}% complete
+                  {formatPercentage(content.watchProgress.progress_percentage, 0)} complete
                 </span>
               </div>
               <div className="w-full bg-muted rounded-full h-3">

@@ -6,7 +6,19 @@ import { Input } from "~/components/ui/input";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { quickSearchContent } from "~/services/contentService";
+import { searchMovies } from "~/services/movieService";
 import type { ContentSearchResult } from "~/types/content";
+import type { Movie } from "~/types/movie";
+
+interface SearchResult {
+  id: number;
+  title: string;
+  description?: string;
+  poster_url?: string;
+  type: 'movie' | 'content';
+  release_year?: number;
+  contentType?: string;
+}
 
 export function SearchDropdown() {
   const [query, setQuery] = useState("");
@@ -31,8 +43,40 @@ export function SearchDropdown() {
     error,
   } = useQuery({
     queryKey: ['search', debouncedQuery],
-    queryFn: () => quickSearchContent(debouncedQuery),
-    enabled: debouncedQuery.trim().length >= 2, // Only search if query is at least 2 characters
+    queryFn: async () => {
+      if (debouncedQuery.trim().length < 2) return [];
+      
+      const [contentResults, movieResults] = await Promise.all([
+        quickSearchContent(debouncedQuery).catch(() => []),
+        searchMovies(debouncedQuery, 5).catch(() => [])
+      ]);
+
+      // Combine and format results
+      const combinedResults: SearchResult[] = [
+        // Add movie results
+        ...movieResults.map((movie: Movie): SearchResult => ({
+          id: movie.id,
+          title: movie.title,
+          description: movie.synopsis || movie.description,
+          poster_url: movie.poster_url,
+          type: 'movie',
+          release_year: movie.release_year,
+          contentType: 'movie'
+        })),
+        // Add content results
+        ...contentResults.map((content: ContentSearchResult): SearchResult => ({
+          id: content.id,
+          title: content.title,
+          description: content.description,
+          poster_url: content.poster_url,
+          type: 'content',
+          contentType: content.contentType
+        }))
+      ];
+
+      return combinedResults.slice(0, 8); // Limit to 8 results
+    },
+    enabled: debouncedQuery.trim().length >= 2,
     staleTime: 1000 * 60 * 2, // Cache for 2 minutes
     gcTime: 1000 * 60 * 5, // Keep in cache for 5 minutes
   });
@@ -132,8 +176,8 @@ export function SearchDropdown() {
               <div className="max-h-96 overflow-y-auto">
                 {results.map((result) => (
                   <Link
-                    key={result.id}
-                    to={`/content/${result.id}`}
+                    key={`${result.type}-${result.id}`}
+                    to={result.type === 'movie' ? `/movies/${encodeURIComponent(result.title)}` : `/content/${result.id}`}
                     onClick={handleResultClick}
                     className="block border-b last:border-b-0 hover:bg-muted/50 transition-colors"
                   >
@@ -146,7 +190,7 @@ export function SearchDropdown() {
                         />
                       ) : (
                         <div className="w-12 h-16 bg-muted rounded-sm flex-shrink-0 flex items-center justify-center">
-                          {getMediaIcon(result.contentType)}
+                          {getMediaIcon(result.contentType || 'movie')}
                         </div>
                       )}
                       
@@ -155,12 +199,19 @@ export function SearchDropdown() {
                           <h4 className="font-medium text-sm line-clamp-1">
                             {result.title}
                           </h4>
-                          <Badge 
-                            variant="secondary" 
-                            className={`text-xs flex-shrink-0 ${getMediaTypeColor(result.contentType)}`}
-                          >
-                            {result.contentType}
-                          </Badge>
+                          <div className="flex items-center gap-1">
+                            <Badge 
+                              variant="secondary" 
+                              className={`text-xs flex-shrink-0 ${getMediaTypeColor(result.contentType || 'movie')}`}
+                            >
+                              {result.contentType || 'movie'}
+                            </Badge>
+                            {result.release_year && (
+                              <span className="text-xs text-muted-foreground">
+                                {result.release_year}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         
                         {result.description && (

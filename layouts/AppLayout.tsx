@@ -15,9 +15,9 @@ export async function loader({ request }: { request: Request }) {
   }
 }
 
-export function shouldRevalidate(){
-  return false;
-}
+// export function shouldRevalidate(){
+//   return false;
+// }
 
 export default function AppLayout() {
   const data = useLoaderData<{ user: User | null , accessToken : string | null }>();

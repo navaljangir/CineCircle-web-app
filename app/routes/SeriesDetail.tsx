@@ -7,6 +7,7 @@ import { Badge } from "~/components/ui/badge";
 import { Film, Play, ArrowLeft } from "lucide-react";
 import { slugToTitle } from "~/lib/seriesUtils";
 import type { Movie } from "~/types/series";
+import { formatDuration } from "~/lib/uiHelper";
 
 export const meta: MetaFunction = ({ params }) => {
   const displayTitle = params.title ? slugToTitle(params.title) : 'Series';
@@ -138,7 +139,7 @@ export default function SeriesDetail() {
                     )}
                     {movie.duration_minutes && (
                       <p className="text-sm text-muted-foreground">
-                        {Math.floor(movie.duration_minutes / 60)}h {movie.duration_minutes % 60}m
+                        {formatDuration(movie.duration_minutes)}
                       </p>
                     )}
                   </CardHeader>
