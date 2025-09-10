@@ -3,9 +3,9 @@ import { Header } from "~/components/header";
 
 export default function HeaderLayout() {
     return (
-        <div className="min-h-screen bg-background flex flex-col">
+        <div className="min-h-screen bg-background flex flex-col"> 
             <Header />
-            <main className="px-4 py-6">
+            <main className="py-6 h-full w-full">
                 <Outlet />
             </main>
         </div>

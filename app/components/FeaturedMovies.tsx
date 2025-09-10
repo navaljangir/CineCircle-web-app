@@ -13,7 +13,7 @@ interface FeaturedMoviesProps {
   limit?: number;
 }
 
-export function FeaturedMovies({ limit = 5 }: FeaturedMoviesProps) {
+export function FeaturedMovies({ limit = 3 }: FeaturedMoviesProps) { // Reduced from 5 to 3
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const {

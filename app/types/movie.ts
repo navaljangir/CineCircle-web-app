@@ -28,8 +28,8 @@ export interface Movie {
   is_featured: boolean;
   is_active: boolean;
   metadata?: any;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
   
   // Additional data when user is authenticated
   isInWatchlist?: boolean;

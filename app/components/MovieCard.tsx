@@ -32,7 +32,7 @@ export function MovieCard({
   return (
     <Card className="group hover:shadow-lg transition-shadow duration-200 overflow-hidden">
       <Link to={`/movies/${encodeURIComponent(movie.title)}`} className="block">
-        <div className="relative aspect-[2/3] overflow-hidden">
+        <div className="relative aspect-square overflow-hidden">
           {movie.poster_url ? (
             <img
               src={movie.poster_url}

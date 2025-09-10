@@ -1,13 +1,12 @@
   import type { LoaderFunctionArgs, MetaFunction } from "react-router";
 import { useLoaderData, Link } from "react-router";
 import { getSeriesByTitle } from "~/services/seriesService";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
-import { Film, Play, ArrowLeft } from "lucide-react";
+import { Film, ArrowLeft } from "lucide-react";
 import { slugToTitle } from "~/lib/seriesUtils";
 import type { Movie } from "~/types/series";
-import { formatDuration } from "~/lib/uiHelper";
+import { MovieGrid } from "~/components/MovieGrid";
 
 export const meta: MetaFunction = ({ params }) => {
   const displayTitle = params.title ? slugToTitle(params.title) : 'Series';
@@ -95,65 +94,14 @@ export default function SeriesDetail() {
           <h2 className="text-2xl font-bold mb-6">Movies in this Series</h2>
           
           {series.movies && series.movies.length > 0 ? (
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-              {series.movies.map((movie: Movie) => (
-                <Card key={movie.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <Link to={`/movies/${movie.id}`}>
-                    <div className="aspect-[2/3] relative">
-                      {movie.poster_url ? (
-                        <img
-                          src={movie.poster_url}
-                          alt={movie.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <Film className="h-12 w-12 text-muted-foreground" />
-                        </div>
-                      )}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                      <div className="absolute bottom-2 left-2 right-2">
-                        <div className="flex justify-between items-end">
-                          {movie.release_year && (
-                            <Badge variant="secondary" className="text-xs">
-                              {movie.release_year}
-                            </Badge>
-                          )}
-                          {movie.imdb_rating && (
-                            <Badge variant="outline" className="text-xs">
-                              ⭐ {movie.imdb_rating}
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                  <CardHeader>
-                    <CardTitle className="text-lg line-clamp-1">
-                      {movie.title}
-                    </CardTitle>
-                    {movie.synopsis && (
-                      <CardDescription className="line-clamp-2">
-                        {movie.synopsis}
-                      </CardDescription>
-                    )}
-                    {movie.duration_minutes && (
-                      <p className="text-sm text-muted-foreground">
-                        {formatDuration(movie.duration_minutes)}
-                      </p>
-                    )}
-                  </CardHeader>
-                  <CardContent>
-                    <Button asChild className="w-full">
-                      <Link to={`/movies/${movie.id}`}>
-                        <Play className="mr-2 h-4 w-4" />
-                        Watch Now
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <MovieGrid 
+              movies={series.movies.map(movie => ({
+                ...movie,
+                uuid: `series-${movie.id}`,
+                is_featured: false,
+                is_active: true,
+              }))} 
+            />
           ) : (
             <div className="text-center py-12">
               <Film className="mx-auto h-12 w-12 text-muted-foreground mb-4" />

@@ -25,7 +25,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   
   const options: MovieSearchOptions = {
     page: parseInt(searchParams.get('page') || '1'),
-    limit: parseInt(searchParams.get('limit') || '20'),
+    limit: parseInt(searchParams.get('limit') || '12'), // Reduced from 20 to 12
     search: searchParams.get('search') || undefined,
     genre: searchParams.get('genre') || undefined,
     director: searchParams.get('director') || undefined,
@@ -38,12 +38,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
   try {
     const moviesData = await getMovies(options, request);
-    console.log(moviesData)
     return { moviesData, options };
   } catch (error) {
     console.error('Failed to load movies:', error);
     return { 
-      moviesData: { movies: [], pagination: { page: 1, limit: 20, total: 0, totalPages: 0, hasNext: false, hasPrev: false } },
+      moviesData: { movies: [], pagination: { page: 1, limit: 12, total: 0, totalPages: 0, hasNext: false, hasPrev: false } }, // Updated limit
       options 
     };
   }
@@ -65,7 +64,7 @@ export default function Movies() {
   // Create search options from current state
   const searchOptions: MovieSearchOptions = {
     page: parseInt(searchParams.get('page') || '1'),
-    limit: parseInt(searchParams.get('limit') || '20'),
+    limit: parseInt(searchParams.get('limit') || '12'), // Reduced from 20 to 12
     search: searchParams.get('search') || undefined,
     genre: searchParams.get('genre') || undefined,
     director: searchParams.get('director') || undefined,
@@ -85,8 +84,10 @@ export default function Movies() {
     queryKey: ['movies', searchOptions],
     queryFn: () => getMovies(searchOptions),
     initialData,
-    staleTime: 1000 * 60 * 2, // 2 minutes
-    gcTime: 1000 * 60 * 5, // 5 minutes
+    staleTime: 1000 * 60 * 3, // 3 minutes (reduced for fresher data)
+    gcTime: 1000 * 60 * 10, // 10 minutes (increased for better caching)
+    refetchOnWindowFocus: false,
+    refetchOnMount: false, // Don't refetch if data exists
   });
 
   // Watchlist mutations
@@ -169,7 +170,7 @@ export default function Movies() {
       {/* Featured Movies Section */}
       {!initialOptions.search && moviesData.pagination.page === 1 && (
         <section className="mb-12">
-          <FeaturedMovies limit={5} />
+          <FeaturedMovies limit={3} />
         </section>
       )}
 
