@@ -1,0 +1,23 @@
+{
+  "name": "node-ffmpeg-watcher",
+  "version": "1.0.0",
+  "description": "A Node.js script to watch a folder and automatically convert videos to CMAF-compliant DASH format using FFmpeg.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "ffmpeg",
+    "dash",
+    "cmaf",
+    "video",
+    "watcher",
+    "chokidar"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chokidar": "^3.5.3",
+    "fluent-ffmpeg": "^2.1.2"
+  }
+}
