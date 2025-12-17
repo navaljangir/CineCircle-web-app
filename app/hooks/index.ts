@@ -8,3 +8,6 @@ export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 
 // Export store types
 export type { RootState, AppDispatch };
+
+// Export hooks
+export { useIntersectionObserver } from './useIntersectionObserver';

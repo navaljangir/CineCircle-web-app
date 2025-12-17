@@ -4,6 +4,8 @@ import { getFeaturedSeries, getAllSeries } from "~/services/seriesService";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
+import { LazyImage } from "~/components/ui/lazy-image";
+import { VirtualizedSeriesGrid } from "~/components/VirtualizedSeriesGrid";
 import { Film, Play } from "lucide-react";
 import { getSeriesPath } from "~/lib/seriesUtils";
 
@@ -21,7 +23,6 @@ export async function loader({ request }: LoaderFunctionArgs) {
       getFeaturedSeries(request),
       getAllSeries({ page: 1, limit: 12 }, request)
     ]);
-    console.log('allSeriesResponse', allSeriesResponse);
     return {
       featuredSeries,
       allSeries: allSeriesResponse?.series || [],
@@ -51,13 +52,11 @@ export default function Series() {
               <Link to={getSeriesPath(featuredSeries.title)}>
                 <div className="relative">
                   {featuredSeries.image_url && (
-                    <div className="aspect-video w-full">
-                      <img
-                        src={featuredSeries.image_url}
-                        alt={featuredSeries.title}
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
+                    <LazyImage
+                      src={featuredSeries.image_url}
+                      alt={featuredSeries.title}
+                      aspectRatio="16/9"
+                    />
                   )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                   <div className="absolute bottom-0 left-0 p-6 text-white">
@@ -91,50 +90,7 @@ export default function Series() {
           </div>
 
           {allSeries.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {allSeries.map((series) => (
-                <Card key={series.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                  <Link to={getSeriesPath(series.title)}>
-                    <div className="aspect-video relative">
-                      {series.image_url ? (
-                        <img
-                          src={series.image_url}
-                          alt={series.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-muted flex items-center justify-center">
-                          <Film className="h-12 w-12 text-muted-foreground" />
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                  <CardHeader>
-                    <div className="space-y-2">
-                      {series.partner_name && (
-                        <Badge variant="secondary" className="text-xs">
-                          {series.partner_name}
-                        </Badge>
-                      )}
-                      <CardTitle className="text-lg line-clamp-1">{series.title}</CardTitle>
-                      {series.description && (
-                        <CardDescription className="line-clamp-2">
-                          {series.description}
-                        </CardDescription>
-                      )}
-                    </div>
-                  </CardHeader>
-                  <CardContent>
-                    <Button asChild className="w-full">
-                      <Link to={getSeriesPath(series.title)}>
-                        <Play className="mr-2 h-4 w-4" />
-                        View Series
-                      </Link>
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <VirtualizedSeriesGrid series={allSeries} className="mb-8" />
           ) : (
             <div className="text-center py-12">
               <Film className="mx-auto h-12 w-12 text-muted-foreground mb-4" />

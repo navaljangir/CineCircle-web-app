@@ -2,10 +2,12 @@ import { Link } from "react-router";
 import { Card, CardContent } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { LazyImage } from "~/components/ui/lazy-image";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { getSeriesPath } from "~/lib/seriesUtils";
 import type { Series } from "~/types/series";
 import { useRef } from "react";
+import { useIntersectionObserver } from "~/hooks/useIntersectionObserver";
 
 interface SeriesCarouselProps {
   title: string;
@@ -15,6 +17,10 @@ interface SeriesCarouselProps {
 
 export function SeriesCarousel({ title, series, viewAllLink }: SeriesCarouselProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [carouselRef, isVisible] = useIntersectionObserver({
+    freezeOnceVisible: true,
+    rootMargin: '200px',
+  });
 
   const scrollLeft = () => {
     if (scrollContainerRef.current) {
@@ -33,7 +39,7 @@ export function SeriesCarousel({ title, series, viewAllLink }: SeriesCarouselPro
   }
 
   return (
-    <section className="py-12">
+    <section ref={carouselRef} className="py-12">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold">{title}</h2>
@@ -59,7 +65,7 @@ export function SeriesCarousel({ title, series, viewAllLink }: SeriesCarouselPro
           className="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
-          {series.map((seriesItem) => (
+          {isVisible && series.map((seriesItem) => (
             <Link 
               key={seriesItem.id} 
               to={getSeriesPath(seriesItem.title)}
@@ -67,20 +73,18 @@ export function SeriesCarousel({ title, series, viewAllLink }: SeriesCarouselPro
             >
               <Card className="w-72 hover:shadow-lg transition-all duration-200 hover:scale-105">
                 <CardContent className="p-0">
-                  <div className="aspect-video relative overflow-hidden rounded-t-lg">
-                    {seriesItem.image_url ? (
-                      <img
-                        src={seriesItem.image_url}
-                        alt={seriesItem.title}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-muted flex items-center justify-center">
-                        <span className="text-muted-foreground">No Image</span>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                  </div>
+                  {seriesItem.image_url ? (
+                    <LazyImage
+                      src={seriesItem.image_url}
+                      alt={seriesItem.title}
+                      aspectRatio="16/9"
+                      containerClassName="rounded-t-lg"
+                    />
+                  ) : (
+                    <div className="aspect-video bg-muted flex items-center justify-center rounded-t-lg">
+                      <span className="text-muted-foreground">No Image</span>
+                    </div>
+                  )}
                   <div className="p-4">
                     <div className="space-y-2">
                       {seriesItem.partner_name && (

@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Search, Filter, Film, SlidersHorizontal } from "lucide-react";
 import { getMovies, addMovieToWatchlist, removeMovieFromWatchlist } from "~/services/movieService";
-import { MovieGrid } from "~/components/MovieGrid";
+import { VirtualizedMovieGrid } from "~/components/VirtualizedMovieGrid";
 import { FeaturedMovies } from "~/components/FeaturedMovies";
 import type { Movie, MovieSearchOptions, MovieSearchResult } from "~/types/movie";
 
@@ -306,11 +306,12 @@ export default function Movies() {
         </div>
 
         {/* Movies Grid */}
-        <MovieGrid
+        <VirtualizedMovieGrid
           movies={moviesData.movies}
           onAddToWatchlist={handleAddToWatchlist}
           onRemoveFromWatchlist={handleRemoveFromWatchlist}
           loading={loading}
+          className="mb-8"
         />
 
         {/* Pagination */}

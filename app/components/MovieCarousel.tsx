@@ -3,6 +3,7 @@ import { Button } from "~/components/ui/button";
 import { MovieCard } from "./MovieCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useRef } from "react";
+import { useIntersectionObserver } from "~/hooks/useIntersectionObserver";
 import type { Movie } from "~/types/movie";
 
 interface MovieCarouselProps {
@@ -21,6 +22,10 @@ export function MovieCarousel({
   onRemoveFromWatchlist
 }: MovieCarouselProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [carouselRef, isVisible] = useIntersectionObserver({
+    freezeOnceVisible: true,
+    rootMargin: '200px',
+  });
 
   const scroll = (direction: 'left' | 'right') => {
     if (scrollRef.current) {
@@ -37,7 +42,7 @@ export function MovieCarousel({
   }
 
   return (
-    <section className="container mx-auto px-4 py-8">
+    <section ref={carouselRef} className="container mx-auto px-4 py-8">
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-2xl font-bold">{title}</h2>
         <div className="flex items-center gap-2">
@@ -70,7 +75,7 @@ export function MovieCarousel({
         className="flex gap-6 overflow-x-auto scrollbar-hide pb-4"
         style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
       >
-        {movies.map((movie) => (
+        {isVisible && movies.map((movie) => (
           <div key={movie.id} className="flex-none w-72">
             <MovieCard
               movie={movie}

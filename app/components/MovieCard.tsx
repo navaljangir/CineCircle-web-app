@@ -2,6 +2,7 @@ import { Link } from "react-router";
 import { Card, CardContent, CardFooter } from "~/components/ui/card";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
+import { LazyImage } from "~/components/ui/lazy-image";
 import { Star, Clock, Calendar, Plus, Check } from "lucide-react";
 import type { Movie } from "~/types/movie";
 import { formatDecimal, formatDuration, formatPercentage } from "~/lib/uiHelper";
@@ -32,16 +33,16 @@ export function MovieCard({
   return (
     <Card className="group hover:shadow-lg transition-shadow duration-200 overflow-hidden">
       <Link to={`/movies/${encodeURIComponent(movie.title)}`} className="block">
-        <div className="relative aspect-square overflow-hidden">
+        <div className="relative">
           {movie.poster_url ? (
-            <img
+            <LazyImage
               src={movie.poster_url}
               alt={movie.title}
-              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-              loading="lazy"
+              aspectRatio="2/3"
+              className="group-hover:scale-105 transition-transform duration-200"
             />
           ) : (
-            <div className="w-full h-full bg-muted flex items-center justify-center">
+            <div className="aspect-[2/3] w-full bg-muted flex items-center justify-center">
               <span className="text-muted-foreground text-sm">No Image</span>
             </div>
           )}
