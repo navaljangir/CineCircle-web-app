@@ -182,6 +182,87 @@ export async function updateMovieWatchProgress(
   return response.data;
 }
 
+// Create complete movie (with video, poster, banner)
+export async function createCompleteMovie(
+  movieData: {
+    title: string;
+    description?: string;
+    director?: string;
+    producer?: string;
+    writer?: string;
+    releaseYear?: number;
+    releaseDate?: string;
+    durationMinutes?: number;
+    language?: string;
+    country?: string;
+    genre?: string;
+    rating?: string;
+    imdbRating?: number;
+    rottenTomatoesScore?: number;
+    boxOfficeGross?: string;
+    budget?: string;
+    awards?: string;
+    synopsis?: string;
+    trivia?: string;
+    isFeatured?: boolean;
+    seriesId?: number;
+    episodeNumber?: number;
+    season?: number;
+  },
+  files: {
+    video: File;
+    poster?: File;
+    banner?: File;
+  },
+  request?: Request
+) {
+  const formData = new FormData();
+  
+  // Add video file
+  formData.append('video', files.video);
+  
+  // Add poster if provided
+  if (files.poster) {
+    formData.append('poster', files.poster);
+  }
+  
+  // Add banner if provided
+  if (files.banner) {
+    formData.append('banner', files.banner);
+  }
+  
+  // Add all movie metadata
+  Object.entries(movieData).forEach(([key, value]) => {
+    if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
+    }
+  });
+
+  const response = await post<{
+    movie: any;
+    video: {
+      videoId: string;
+      jobId: string;
+      status: string;
+      message: string;
+    };
+    images: {
+      posterUrl?: string;
+      thumbnailUrl?: string;
+      bannerUrl?: string;
+    };
+    nextSteps: string[];
+  }>({
+    url: ENDPOINTS.CREATE_COMPLETE_MOVIE,
+    body: formData as any,
+    formData: true,
+    useAuth: true,
+    fetchRequest: request,
+  });
+  
+  return response.data;
+}
+
 // Legacy exports for backward compatibility
 export { 
   getFeaturedMovies as getSeries,

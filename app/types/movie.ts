@@ -35,6 +35,10 @@ export interface Movie {
   isInWatchlist?: boolean;
   watchProgress?: MovieWatchProgress;
   
+  // Streaming data (from getMovieForStreaming)
+  playlist_url?: string;
+  thumbnail_url?: string;
+  
   // Related data
   castCrew?: CastCrewMember[];
   relatedContent?: RelatedContent[];

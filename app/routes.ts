@@ -15,10 +15,9 @@ export default [
             route('/content/:id', "routes/ContentDetail.tsx"),
             route('/movies', "routes/Movies.tsx"),
             route('/movies/:id', "routes/MovieDetail.tsx"),
-            route('/movies/:id/watch', "routes/MovieWatch.tsx"),
+            route('/admin/movie-upload', "routes/admin.movie-upload.tsx"),
         ]),
         
-        // Catch-all route for well-known URLs (Chrome DevTools, security.txt, etc.)
         route('/.well-known/*', "routes/_well-known.tsx"),
     ]),
 ] satisfies RouteConfig;

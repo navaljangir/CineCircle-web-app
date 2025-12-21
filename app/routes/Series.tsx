@@ -5,7 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/com
 import { Button } from "~/components/ui/button";
 import { Badge } from "~/components/ui/badge";
 import { LazyImage } from "~/components/ui/lazy-image";
-import { VirtualizedSeriesGrid } from "~/components/VirtualizedSeriesGrid";
+import { SeriesGrid } from "~/components/SeriesGrid";
 import { Film, Play } from "lucide-react";
 import { getSeriesPath } from "~/lib/seriesUtils";
 
@@ -90,7 +90,7 @@ export default function Series() {
           </div>
 
           {allSeries.length > 0 ? (
-            <VirtualizedSeriesGrid series={allSeries} className="mb-8" />
+            <SeriesGrid series={allSeries} className="mb-8" />
           ) : (
             <div className="text-center py-12">
               <Film className="mx-auto h-12 w-12 text-muted-foreground mb-4" />

@@ -31,9 +31,9 @@ export function MovieCard({
   };
 
   return (
-    <Card className="group hover:shadow-lg transition-shadow duration-200 overflow-hidden">
+    <Card className="group hover:shadow-lg transition-shadow duration-200 overflow-hidden h-full flex flex-col">
       <Link to={`/movies/${encodeURIComponent(movie.title)}`} className="block">
-        <div className="relative">
+        <div className="relative overflow-hidden">
           {movie.poster_url ? (
             <LazyImage
               src={movie.poster_url}
@@ -62,7 +62,7 @@ export function MovieCard({
         </div>
       </Link>
 
-      <CardContent className="p-4">
+      <CardContent className="p-4 flex-1">
         <Link to={`/movies/${encodeURIComponent(movie.title)}`} className="block">
           <h3 className="font-semibold text-lg mb-2 line-clamp-2 group-hover:text-primary transition-colors">
             {movie.title}

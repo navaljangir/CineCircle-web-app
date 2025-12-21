@@ -35,15 +35,39 @@ LOGOUT: "/api/v1/auth/logout",
   // Movies
   GET_MOVIES: "/api/v1/movies",
   GET_FEATURED_MOVIES: "/api/v1/movies/featured",
-  GET_MOVIE_BY_TITLE_OR_ID: "/api/v1/movies",
-  GET_MOVIE_STREAM: "/api/v1/movies",
-  GET_MOVIE_CAST: "/api/v1/movies",
-  GET_MOVIE_RELATED: "/api/v1/movies",
   SEARCH_MOVIES: "/api/v1/movies/search",
   GET_MOVIES_BY_DIRECTOR: "/api/v1/movies/director",
-  ADD_MOVIE_TO_WATCHLIST: "/api/v1/movies",
-  REMOVE_MOVIE_FROM_WATCHLIST: "/api/v1/movies",
-  UPDATE_MOVIE_PROGRESS: "/api/v1/movies",
+  GET_MOVIE_BY_TITLE_OR_ID: "/api/v1/movies",
+  GET_MOVIE_STREAM: "/api/v1/movies", // /:titleOrId/stream
+  GET_MOVIE_CAST: "/api/v1/movies", // /:titleOrId/cast
+  GET_MOVIE_RELATED: "/api/v1/movies", // /:titleOrId/related
+  ADD_MOVIE_TO_WATCHLIST: "/api/v1/movies", // /:titleOrId/watchlist
+  REMOVE_MOVIE_FROM_WATCHLIST: "/api/v1/movies", // /:titleOrId/watchlist
+  UPDATE_MOVIE_PROGRESS: "/api/v1/movies", // /:titleOrId/progress
+  CREATE_COMPLETE_MOVIE: "/api/v1/movies/create-complete",
+  UPDATE_MOVIE: "/api/v1/movies", // /:id
+  DELETE_MOVIE: "/api/v1/movies", // /:id
+
+  // Videos
+  UPLOAD_VIDEO: "/api/v1/videos/upload", // Deprecated
+  GET_VIDEO_STATUS: "/api/v1/videos/status", // /:videoId
+  GENERATE_VIDEO_ACCESS: "/api/v1/videos/generate-access", // /:videoId
+  GET_VIDEO_STREAM: "/api/v1/videos/stream", // /:videoId (deprecated)
+  
+  // Admin Video Management
+  GET_ALL_VIDEOS_ADMIN: "/api/v1/videos/admin/list",
+  UPDATE_VIDEO_METADATA: "/api/v1/videos/admin", // /:videoId/metadata
+  DELETE_VIDEO: "/api/v1/videos/admin", // /:videoId
+  GET_VIDEO_STATS: "/api/v1/videos/admin/stats",
+  MODERATE_VIDEO: "/api/v1/videos/admin", // /:videoId/moderate
+
+  // Media (Images)
+  UPLOAD_POSTER: "/api/v1/media/upload-poster",
+  UPLOAD_BANNER: "/api/v1/media/upload-banner",
+  UPLOAD_THUMBNAIL: "/api/v1/media/upload-thumbnail",
+  UPLOAD_RESPONSIVE: "/api/v1/media/upload-responsive",
+  PROCESS_BATCH_IMAGES: "/api/v1/media/process-batch",
+  GET_IMAGE_JOB_STATUS: "/api/v1/media/job-status", // /:jobId
 
   // Content
   GET_CONTENT_BY_ID: "/api/v1/content",
@@ -51,13 +75,6 @@ LOGOUT: "/api/v1/auth/logout",
   ADD_TO_WATCHLIST: "/api/v1/content/watchlist",
   REMOVE_FROM_WATCHLIST: "/api/v1/content/watchlist",
   UPDATE_WATCH_PROGRESS: "/api/v1/content/progress",
-
-  // Admin Content Management
-  GET_ALL_VIDEOS: "/api/v1/content/admin/videos",
-  UPDATE_VIDEO_METADATA: "/api/v1/content/admin/videos",
-  DELETE_VIDEO: "/api/v1/content/admin/videos",
-  MODERATE_VIDEO: "/api/v1/content/admin/moderate",
-  GET_UPLOAD_STATS: "/api/v1/content/admin/upload-stats",
 
   // Home/Dashboard
   GET_HOME_DATA: "/api/v1/home",
